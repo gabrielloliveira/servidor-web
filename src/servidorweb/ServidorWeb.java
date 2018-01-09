@@ -36,12 +36,11 @@ public class ServidorWeb {
         return linha;
     }
     
-    private static String CriaResposta(String arquivo) {
+    private static String CriaResposta(String arquivo, String contentType) {
         
         SimpleDateFormat formatador = new SimpleDateFormat("E, dd MMM yyyy hh:mm:ss", Locale.ENGLISH);
         formatador.setTimeZone(TimeZone.getTimeZone("GMT"));
         Date data = new Date();
-        //Formata a dara para o padrao
         String dataFormatada = formatador.format(data) + " GMT";
         
         StringBuilder sb = new StringBuilder();
@@ -49,7 +48,7 @@ public class ServidorWeb {
         sb.append("Date: ").append(dataFormatada).append("\r\n");
         sb.append("Server: Test Server").append("\r\n");
         sb.append("Connection: Close").append("\r\n");
-        sb.append("Content-Type: text/html; charset=UTF-8").append("\r\n");
+        sb.append("Content-Type: ").append(contentType).append("; charset=UTF-8").append("\r\n");
         sb.append("\r\n");
         
         String respostaArquivo = LerArquivo(arquivo);
@@ -62,6 +61,7 @@ public class ServidorWeb {
     public static void main(String[] args){
             try {
             ServerSocket servidor = new ServerSocket(8000);
+            System.out.println("Servidor iniciado! Acesse localhost:8000 e veja");
             while (true) {
                 Socket cliente = servidor.accept();
                 
@@ -81,16 +81,21 @@ public class ServidorWeb {
                         String[] dadosReq = leitura.split(" ");
                         String caminhoArquivo = dadosReq[1];
                         String arquivo = "";
-                        
+                        String contentType =  "";
                         
                         if(caminhoArquivo.equals("/")){
                             arquivo = "index.html";
+                            contentType = "text/html";
                         }else{
                             String[] quebraCaminho = caminhoArquivo.split("/");
                             arquivo = quebraCaminho[1];
+                            String[] extensao = arquivo.split(".");
+                            if(extensao.equals("css")){
+                                contentType = "text/css";
+                            }
                         }
                         
-                        String resposta = CriaResposta(arquivo);
+                        String resposta = CriaResposta(arquivo, contentType);
                         cliente.getOutputStream().write(resposta.getBytes());
                         cliente.close();
                         
