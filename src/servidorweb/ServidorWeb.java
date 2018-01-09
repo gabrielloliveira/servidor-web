@@ -1,21 +1,24 @@
 package servidorweb;
 import java.net.*;
 import java.io.*;
+import java.nio.file.Files;
 import java.util.*;
 
 public class ServidorWeb {
 
     Socket cliente;
     
-    private static String LerArquivo(){
+    private static String LerArquivo(String arquivo){
+        String base = "/home/gabriell/NetBeansProjects/ServidorWeb/src/servidorweb/";
         String linha = "";
         
         try{
-            String base = "/home/gabriell/NetBeansProjects/ServidorWeb/src/servidorweb/"; 
-            BufferedReader br = new BufferedReader(new FileReader(base + "index.html"));
+            BufferedReader br = new BufferedReader(new FileReader(base + arquivo));
+            
             while(br.ready()){
-                linha = br.readLine();
-            }   
+                linha += br.readLine();
+            } 
+            br.close();
         }catch(IOException e){
             e.printStackTrace();
         }
@@ -23,7 +26,7 @@ public class ServidorWeb {
         return linha;
     }
     
-    private static String CriaResposta() {
+    private static String CriaResposta(String arquivo) {
         
         StringBuilder sb = new StringBuilder();
         sb.append("HTTP/1.1 200 OK").append("\r\n");
@@ -33,17 +36,9 @@ public class ServidorWeb {
         sb.append("Content-Type: text/html; charset=UTF-8").append("\r\n");
         sb.append("\r\n");
         
-        String respostaArquivo = LerArquivo();
+        String respostaArquivo = LerArquivo(arquivo);
         sb.append(respostaArquivo);
         
-        
-//        sb.append("<html><head><title>Servidor web</title></head><body><h1>HttpServer Response</h1>");
-//        sb.append("Method: ").append("GET").append("<br/>");
-//        sb.append("URI: ").append("/").append("<br/>");
-//        sb.append("Protocol: ").append("HTTP/1.1").append("<br/>");
-//        sb.append("</body></html>");
-
-//        if()
         return sb.toString();
     }
     
@@ -64,10 +59,22 @@ public class ServidorWeb {
                         System.out.println("Hostname "
                                            + cliente.getInetAddress().
                                             getHostName());
+                       
+                        BufferedReader buffer = new BufferedReader(new InputStreamReader(cliente.getInputStream()));
+                        String leitura = buffer.readLine();
+                        String[] dadosReq = leitura.split(" ");
+                        String caminhoArquivo = dadosReq[1];
+                        String arquivo = "";
                         
-                        String request = cliente.getInputStream().toString();
-                        System.out.println(request);
-                        String resposta = CriaResposta();
+                        
+                        if(caminhoArquivo.equals("/")){
+                            arquivo = "index.html";
+                        }else{
+                            String[] quebraCaminho = caminhoArquivo.split("/");
+                            arquivo = quebraCaminho[1];
+                        }
+                        
+                        String resposta = CriaResposta(arquivo);
                         cliente.getOutputStream().write(resposta.getBytes());
                         cliente.close();
                         
