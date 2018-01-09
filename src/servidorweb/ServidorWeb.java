@@ -2,6 +2,7 @@ package servidorweb;
 import java.net.*;
 import java.io.*;
 import java.nio.file.Files;
+import java.text.SimpleDateFormat;
 import java.util.*;
 
 public class ServidorWeb {
@@ -37,9 +38,15 @@ public class ServidorWeb {
     
     private static String CriaResposta(String arquivo) {
         
+        SimpleDateFormat formatador = new SimpleDateFormat("E, dd MMM yyyy hh:mm:ss", Locale.ENGLISH);
+        formatador.setTimeZone(TimeZone.getTimeZone("GMT"));
+        Date data = new Date();
+        //Formata a dara para o padrao
+        String dataFormatada = formatador.format(data) + " GMT";
+        
         StringBuilder sb = new StringBuilder();
         sb.append("HTTP/1.1 200 OK").append("\r\n");
-        sb.append("Date: ").append(new Date()).append("\r\n");
+        sb.append("Date: ").append(dataFormatada).append("\r\n");
         sb.append("Server: Test Server").append("\r\n");
         sb.append("Connection: Close").append("\r\n");
         sb.append("Content-Type: text/html; charset=UTF-8").append("\r\n");
