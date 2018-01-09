@@ -9,16 +9,25 @@ public class ServidorWeb {
     Socket cliente;
     
     private static String LerArquivo(String arquivo){
-        String base = "/home/gabriell/NetBeansProjects/ServidorWeb/src/servidorweb/";
+        String base = "/home/gabriell/NetBeansProjects/ServidorWeb/src/servidorweb/www/";
         String linha = "";
         
         try{
-            BufferedReader br = new BufferedReader(new FileReader(base + arquivo));
+            File pagina = new File(base+arquivo);
             
-            while(br.ready()){
-                linha += br.readLine();
-            } 
-            br.close();
+            if(pagina.exists()){
+                BufferedReader br = new BufferedReader(new FileReader(base + arquivo));
+                while(br.ready()){
+                    linha += br.readLine();
+                } 
+                br.close();
+            }else{
+                BufferedReader br = new BufferedReader(new FileReader(base + "404.html"));
+                while(br.ready()){
+                    linha += br.readLine();
+                } 
+                br.close();
+            }
         }catch(IOException e){
             e.printStackTrace();
         }
