@@ -2,7 +2,7 @@
 <html lang="en">
 <head>
   <meta charset="UTF-8">
-  <title>Index2</title>
+  <title>Index</title>
   <link rel="stylesheet" href="bulma.css">
 </head>
 <body>
@@ -27,14 +27,14 @@
       </button>
     </div>
   </nav>
-  <section class="hero is-success is-fullheight">
+  <section class="hero is-info is-fullheight">
     <div class="hero-body">
       <div class="container has-text-centered">
         <h1 class="title">
-          Essa é outra página qualquer
+          Essa página é feita em php
         </h1>
         <h2 class="subtitle">
-          Esse servidor funciona com várias páginas
+          Para comprovar, estou calculando a soma de 30 + 20 = <?php $soma = 30+20; echo $soma; ?>
         </h2>
       </div>
     </div>

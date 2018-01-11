@@ -1,7 +1,6 @@
 package servidorweb;
 import java.net.*;
 import java.io.*;
-import java.nio.file.Files;
 import java.text.SimpleDateFormat;
 import java.util.*;
 
@@ -17,11 +16,28 @@ public class ServidorWeb {
             File pagina = new File(base+arquivo);
             
             if(pagina.exists()){
-                BufferedReader br = new BufferedReader(new FileReader(base + arquivo));
-                while(br.ready()){
-                    linha += br.readLine();
-                } 
-                br.close();
+                String temp = arquivo.replace(".", "#");
+                String[] extensao = temp.split("#");
+                if(extensao[1].equals("php")){
+                    final ProcessBuilder processBuilder = new ProcessBuilder();
+                    processBuilder.command("/usr/bin/php", base + arquivo);
+                    final Process process = processBuilder.start();    
+                    process.getInputStream().read();
+                    BufferedReader br = new BufferedReader(new InputStreamReader(process.getInputStream()));
+                    linha = "<";
+                    while(br.ready()){
+                        linha += br.readLine();
+                    }
+                    br.close();
+                    process.destroy();
+                }else{
+                    BufferedReader br = new BufferedReader(new FileReader(base + arquivo));
+                    while(br.ready()){
+                        linha += br.readLine();
+                    } 
+                    br.close();
+                }
+                
             }else{
                 BufferedReader br = new BufferedReader(new FileReader(base + "404.html"));
                 while(br.ready()){
@@ -68,14 +84,7 @@ public class ServidorWeb {
                 new Thread(() -> {
                     
                     try{
-                        
-                        System.out.println("Nova conexão com o cliente "
-                                           + cliente.getInetAddress().
-                                            getHostAddress());
-                        System.out.println("Hostname "
-                                           + cliente.getInetAddress().
-                                            getHostName());
-                       
+
                         BufferedReader buffer = new BufferedReader(new InputStreamReader(cliente.getInputStream()));
                         String leitura = buffer.readLine();
                         String[] dadosReq = leitura.split(" ");
@@ -89,10 +98,19 @@ public class ServidorWeb {
                         }else{
                             String[] quebraCaminho = caminhoArquivo.split("/");
                             arquivo = quebraCaminho[1];
-                            String[] extensao = arquivo.split(".");
-                            if(extensao.equals("css")){
-                                contentType = "text/css";
+                            try{
+                                String temp = arquivo.replace(".", "#");
+                                String[] extensao = temp.split("#");
+
+                                if(extensao[1].equals("css")){
+                                    contentType = "text/css";
+                                }else if(extensao[1].equals("php")){
+                                    contentType = "text/html";
+                                }
+                            }catch(Exception e){
+                                contentType = "text/html";
                             }
+                            
                         }
                         
                         String resposta = CriaResposta(arquivo, contentType);
