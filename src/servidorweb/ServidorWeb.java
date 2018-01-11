@@ -8,6 +8,18 @@ public class ServidorWeb {
 
     Socket cliente;
     
+    private static String Status(String arquivo){
+        String base = "/home/gabriell/NetBeansProjects/ServidorWeb/src/servidorweb/www/";
+        
+        File pagina = new File(base+arquivo);
+            
+        if(pagina.exists()){
+            return "200 OK";
+        }else{
+            return "404 Not Found";
+        }
+    }
+    
     private static String LerArquivo(String arquivo){
         String base = "/home/gabriell/NetBeansProjects/ServidorWeb/src/servidorweb/www/";
         String linha = "";
@@ -58,9 +70,10 @@ public class ServidorWeb {
         formatador.setTimeZone(TimeZone.getTimeZone("GMT"));
         Date data = new Date();
         String dataFormatada = formatador.format(data) + " GMT";
+        String status = Status(arquivo);
         
         StringBuilder sb = new StringBuilder();
-        sb.append("HTTP/1.1 200 OK").append("\r\n");
+        sb.append("HTTP/1.1 ").append(status).append("\r\n");
         sb.append("Date: ").append(dataFormatada).append("\r\n");
         sb.append("Server: Test Server").append("\r\n");
         sb.append("Connection: Close").append("\r\n");
@@ -104,7 +117,7 @@ public class ServidorWeb {
 
                                 if(extensao[1].equals("css")){
                                     contentType = "text/css";
-                                }else if(extensao[1].equals("php")){
+                                }else{
                                     contentType = "text/html";
                                 }
                             }catch(Exception e){
